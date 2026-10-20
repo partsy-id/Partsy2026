@@ -6,6 +6,8 @@
     <title>Jadwal Program Acara</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Library untuk Convert HTML ke Gambar/PDF 1:1 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         .brutal-card {
             border: 3px solid #000;
@@ -20,6 +22,10 @@
                 transform: translate(-2px, -2px);
                 box-shadow: 7px 7px 0px #000;
             }
+        }
+        /* Format Khusus Persegi 1:1 untuk Ekspor Sosmed */
+        .square-export {
+            aspect-ratio: 1 / 1;
         }
     </style>
 </head>
@@ -67,7 +73,6 @@
     </div>
 
     <script>
-        // LINK CSV SPREADSHEET PROGRAM ACARA
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-IjaSVhXJY_Q2hFiqTRms9pEpLhBVjXrxD_A2RuHqdcaX3np1yU8vbQuOgttdQJ3pu8nu62CEuEeZ/pub?gid=0&single=true&output=csv';
 
         let allData = [];
@@ -75,17 +80,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             Papa.parse(sheetUrl, {
                 download: true,
-                header: true,
+                header: false,
                 skipEmptyLines: true,
                 complete: function(results) {
                     const loadingEl = document.getElementById('loading');
                     if (loadingEl) loadingEl.style.display = 'none';
                     
-                    // Memfilter baris kosong
-                    allData = results.data.filter(item => {
-                        const namaVal = item['Nama Penampil'] || item.namaPenampil || item.Nama || item.nama;
-                        return namaVal && namaVal.trim() !== '';
-                    });
+                    const rows = results.data;
+
+                    let dataRows = rows;
+                    if (rows.length > 0 && (rows[0][0].toLowerCase().includes('nama') || rows[0][0].toLowerCase().includes('penampil'))) {
+                        dataRows = rows.slice(1);
+                    }
+
+                    allData = dataRows.map(row => ({
+                        nama: row[0] || '',
+                        day: row[1] || '',
+                        tanggal: row[2] || '',
+                        jam: row[3] || ''
+                    })).filter(item => item.nama.trim() !== '');
 
                     renderData(allData);
                 },
@@ -107,44 +120,65 @@
             if (data.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full brutal-card bg-white p-6 text-center font-bold text-sm sm:text-base">
-                        📭 Tidak ada jadwal penampil untuk kategori ini.
+                        📭 Belum ada data jadwal yang dapat ditampilkan.
                     </div>
                 `;
                 return;
             }
 
             data.forEach((item, index) => {
-                const nama = item['Nama Penampil'] || item.namaPenampil || item.Nama || item.nama || 'Penampil';
-                const day = item['Day'] || item.day || item.Hari || item.hari || 'Day -';
-                const tanggal = item['Tgl Program'] || item.tglProgram || item.Tanggal || item.tanggal || '-';
-                const jam = item['Jam Program'] || item.jamProgram || item.Jam || item.jam || '-';
-
+                const cardId = `card-${index}`;
                 const card = document.createElement('div');
-                card.className = 'brutal-card bg-white p-4 sm:p-5 rounded-xl flex flex-col h-full justify-between';
+                card.className = 'flex flex-col gap-2';
+                
                 card.innerHTML = `
-                    <div>
-                        <div class="flex items-start justify-between gap-2 mb-3">
-                            <span class="bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded">
-                                📌 ${day}
-                            </span>
-                            <span class="bg-gray-100 border border-black text-gray-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded">
-                                #${index + 1}
-                            </span>
+                    <!-- Area Kartu Persegi 1:1 -->
+                    <div id="${cardId}" class="brutal-card bg-white p-5 rounded-xl flex flex-col justify-between square-export relative overflow-hidden">
+                        <div>
+                            <div class="flex items-start justify-between gap-2 mb-3">
+                                <span class="bg-black text-white text-xs font-black px-2.5 py-1 rounded">
+                                    📌 ${item.day || 'Day -'}
+                                </span>
+                                <span class="bg-gray-100 border border-black text-gray-800 text-xs font-bold px-2 py-0.5 rounded">
+                                    #${index + 1}
+                                </span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black leading-snug break-words mb-4 mt-2">${item.nama}</h2>
                         </div>
-                        <h2 class="text-lg sm:text-xl font-black leading-snug break-words mb-4">${nama}</h2>
+                        <div class="border-t-2 border-black pt-3 mt-auto space-y-2 text-xs sm:text-sm font-bold text-gray-800">
+                            <div class="flex justify-between items-center">
+                                <span>📅 Tanggal:</span>
+                                <span class="bg-yellow-100 border border-black px-2 py-0.5 rounded">${item.tanggal || '-'}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>⏰ Waktu:</span>
+                                <span class="bg-yellow-300 border border-black px-2 py-0.5 rounded font-black">${item.jam || '-'}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="border-t-2 border-black pt-3 mt-auto space-y-1.5 text-xs font-bold text-gray-800">
-                        <div class="flex justify-between items-center">
-                            <span>📅 Tanggal:</span>
-                            <span class="bg-yellow-100 border border-black px-2 py-0.5 rounded">${tanggal}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>⏰ Waktu:</span>
-                            <span class="bg-yellow-300 border border-black px-2 py-0.5 rounded font-black">${jam}</span>
-                        </div>
-                    </div>
+
+                    <!-- Tombol Download khusus sosmed -->
+                    <button onclick="downloadCard('${cardId}', '${item.nama}')" 
+                        class="w-full bg-black hover:bg-gray-800 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-transform active:scale-95">
+                        📷 Unduh Kartu (1:1 HQ)
+                    </button>
                 `;
                 container.appendChild(card);
+            });
+        }
+
+        // Fungsi mengunduh kartu menjadi Gambar PNG Resolusi Tinggi (1:1)
+        function downloadCard(cardId, namaPenampil) {
+            const cardElement = document.getElementById(cardId);
+            
+            html2canvas(cardElement, {
+                scale: 3, // Skala tinggi agar tajam saat diupload ke IG/Sosmed
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Jadwal-${namaPenampil.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
             });
         }
 
@@ -163,10 +197,9 @@
             if (selectedDay === 'ALL') {
                 renderData(allData);
             } else {
-                const filtered = allData.filter(item => {
-                    const dayVal = item['Day'] || item.day || item.Hari || item.hari || '';
-                    return dayVal.toLowerCase().trim() === selectedDay.toLowerCase().trim();
-                });
+                const filtered = allData.filter(item => 
+                    item.day.toLowerCase().trim() === selectedDay.toLowerCase().trim()
+                );
                 renderData(filtered);
             }
         }
