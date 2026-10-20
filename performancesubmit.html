@@ -3,43 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Input Acara - Panitia</title>
+    <title>Form Input Program & Foto</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .brutal-card {
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0px #000;
-        }
+        .brutal-card { border: 3px solid #000; box-shadow: 5px 5px 0px #000; }
     </style>
 </head>
 <body class="bg-[#f4f4f5] text-gray-900 font-sans p-4 sm:p-8 min-h-screen flex items-center justify-center">
 
     <div class="w-full max-w-lg bg-white brutal-card p-6 sm:p-8 rounded-xl">
-        <!-- Header -->
         <div class="mb-6 border-b-4 border-black pb-3">
-            <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-tight">Form Program Acara</h1>
-            <p class="text-xs sm:text-sm font-bold text-gray-600 mt-1">Input data penampil langsung ke Google Spreadsheet</p>
+            <h1 class="text-2xl sm:text-3xl font-black uppercase">Form Program Acara</h1>
+            <p class="text-xs sm:text-sm font-bold text-gray-600 mt-1">Input data & foto penampil langsung ke Drive/Spreadsheet</p>
         </div>
 
-        <!-- Alert Status -->
         <div id="statusAlert" class="hidden mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm"></div>
 
-        <!-- Form -->
-        <form id="programForm" class="space-y-4 sm:space-y-5">
-            <!-- 1. Nama Penampil -->
+        <form id="programForm" class="space-y-4">
             <div>
                 <label class="block font-black text-sm uppercase mb-1">Nama Penampil</label>
-                <input type="text" id="namaPenampil" required placeholder="Contoh: Band Akustik / Sanggar Tari"
-                    class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                <input type="text" id="namaPenampil" required placeholder="Contoh: Band Akustik" class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
             </div>
 
-            <!-- Grid 2 Kolom: Day & Tanggal -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- 2. Day (1 - 5) -->
                 <div>
                     <label class="block font-black text-sm uppercase mb-1">Hari (Day)</label>
-                    <select id="day" required
-                        class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                    <select id="day" required class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
                         <option value="" disabled selected>-- Pilih Day --</option>
                         <option value="Day 1">Day 1</option>
                         <option value="Day 2">Day 2</option>
@@ -48,61 +37,70 @@
                         <option value="Day 5">Day 5</option>
                     </select>
                 </div>
-
-                <!-- 3. Tanggal Program -->
                 <div>
                     <label class="block font-black text-sm uppercase mb-1">Tgl Program</label>
-                    <input type="date" id="tglProgram" required
-                        class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                    <input type="date" id="tglProgram" required class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
                 </div>
             </div>
 
-            <!-- Grid 2 Kolom: Jam Mulai & Jam Selesai -->
             <div>
                 <label class="block font-black text-sm uppercase mb-1">Waktu / Jam Program</label>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <span class="block text-xs font-bold text-gray-600 mb-1">Jam Mulai</span>
-                        <input type="time" id="jamMulai" required
-                            class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
-                    </div>
-                    <div>
-                        <span class="block text-xs font-bold text-gray-600 mb-1">Jam Selesai</span>
-                        <input type="time" id="jamSelesai" required
-                            class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
-                    </div>
+                    <input type="time" id="jamMulai" required class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                    <input type="time" id="jamSelesai" required class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
                 </div>
             </div>
 
-            <!-- Tombol Submit -->
-            <button type="submit" id="submitBtn"
-                class="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-black border-2 border-black p-3 rounded-lg transition-transform active:translate-y-1 shadow-[3px_3px_0px_#000]">
-                🚀 SIMPAN DATA
+            <!-- Input Upload Foto -->
+            <div>
+                <label class="block font-black text-sm uppercase mb-1">Foto Penampil (Opsional)</label>
+                <input type="file" id="fotoInput" accept="image/*" class="w-full border-2 border-black p-2 rounded-lg font-semibold bg-gray-50 text-sm">
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-black border-2 border-black p-3 rounded-lg shadow-[3px_3px_0px_#000]">
+                🚀 SIMPAN DATA & FOTO
             </button>
         </form>
     </div>
 
     <script>
-        // PASTE URL DEPLOYMENT GOOGLE APPS SCRIPT KAMU DI SINI
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbylQaJyVsKn2bp4bB-EmmxNQDnPh0vt--pvOb68us4xNbKQK6hlw_63dCfhyGqjcYHs/exec';
+        const scriptURL = 'PASTE_URL_WEB_APP_APPS_SCRIPT_KAMU_DI_SINI';
 
         const form = document.getElementById('programForm');
         const submitBtn = document.getElementById('submitBtn');
         const statusAlert = document.getElementById('statusAlert');
 
-        form.addEventListener('submit', e => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             submitBtn.disabled = true;
-            submitBtn.innerText = '⏳ Menyimpan...';
+            submitBtn.innerText = '⏳ Mengunggah foto & data...';
             statusAlert.classList.add('hidden');
+
+            const fileInput = document.getElementById('fotoInput');
+            let fotoData = null, fotoName = null, fotoType = null;
+
+            // Jika ada file foto yang dipilih, konversi ke Base64
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fotoName = file.name;
+                fotoType = file.type;
+                fotoData = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+            }
 
             const payload = {
                 namaPenampil: document.getElementById('namaPenampil').value,
                 day: document.getElementById('day').value,
                 tglProgram: document.getElementById('tglProgram').value,
                 jamMulai: document.getElementById('jamMulai').value,
-                jamSelesai: document.getElementById('jamSelesai').value
+                jamSelesai: document.getElementById('jamSelesai').value,
+                fotoData: fotoData,
+                fotoName: fotoName,
+                fotoType: fotoType
             };
 
             fetch(scriptURL, {
@@ -113,21 +111,20 @@
             })
             .then(() => {
                 statusAlert.className = 'mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm bg-green-300 text-black';
-                statusAlert.innerText = '✅ Data berhasil disimpan ke Spreadsheet!';
+                statusAlert.innerText = '✅ Data dan foto berhasil disimpan!';
                 statusAlert.classList.remove('hidden');
 
                 form.reset();
                 submitBtn.disabled = false;
-                submitBtn.innerText = '🚀 SIMPAN DATA';
+                submitBtn.innerText = '🚀 SIMPAN DATA & FOTO';
             })
             .catch(error => {
                 statusAlert.className = 'mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm bg-red-300 text-black';
-                statusAlert.innerText = '❌ Gagal mengirim data. Coba lagi!';
+                statusAlert.innerText = '❌ Gagal mengunggah data. Coba lagi!';
                 statusAlert.classList.remove('hidden');
 
                 submitBtn.disabled = false;
-                submitBtn.innerText = '🚀 SIMPAN DATA';
-                console.error('Error!', error.message);
+                submitBtn.innerText = '🚀 SIMPAN DATA & FOTO';
             });
         });
     </script>
