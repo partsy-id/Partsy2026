@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Program Acara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        .brutal-card {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.2s ease;
+        }
+        @media (min-width: 640px) {
+            .brutal-card {
+                box-shadow: 5px 5px 0px #000;
+            }
+            .brutal-card:hover {
+                transform: translate(-2px, -2px);
+                box-shadow: 7px 7px 0px #000;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#f4f4f5] text-gray-900 font-sans p-4 sm:p-6 md:p-10 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="mb-6 sm:mb-8 text-center sm:text-left">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black border-b-4 border-black inline-block pb-1 sm:pb-2 uppercase tracking-tight">
+                Jadwal Program Acara
+            </h1>
+            <p class="text-xs sm:text-base font-bold text-gray-700 mt-2">
+                Update Otomatis Real-time dari Google Spreadsheet
+            </p>
+        </header>
+
+        <!-- Filter Tab Hari (Day 1 - Day 5) -->
+        <div class="mb-6 sm:mb-8 flex flex-wrap gap-2 justify-center sm:justify-start" id="filter-container">
+            <button onclick="filterDay('ALL')" class="filter-btn active-btn brutal-card bg-yellow-300 text-black px-4 py-2 rounded-lg font-black text-xs sm:text-sm">
+                Semua Hari
+            </button>
+            <button onclick="filterDay('Day 1')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+                Day 1
+            </button>
+            <button onclick="filterDay('Day 2')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+                Day 2
+            </button>
+            <button onclick="filterDay('Day 3')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+                Day 3
+            </button>
+            <button onclick="filterDay('Day 4')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+                Day 4
+            </button>
+            <button onclick="filterDay('Day 5')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+                Day 5
+            </button>
+        </div>
+
+        <!-- Status Loading -->
+        <div id="loading" class="brutal-card bg-yellow-300 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6">
+            ⚡ Memuat jadwal acara...
+        </div>
+
+        <!-- Grid Responsif -->
+        <div id="data-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"></div>
+    </div>
+
+    <script>
+        // LINK CSV SPREADSHEET PROGRAM ACARA
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-IjaSVhXJY_Q2hFiqTRms9pEpLhBVjXrxD_A2RuHqdcaX3np1yU8vbQuOgttdQJ3pu8nu62CEuEeZ/pub?gid=0&single=true&output=csv';
+
+        let allData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Papa.parse(sheetUrl, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // Memfilter baris kosong
+                    allData = results.data.filter(item => {
+                        const namaVal = item['Nama Penampil'] || item.namaPenampil || item.Nama || item.nama;
+                        return namaVal && namaVal.trim() !== '';
+                    });
+
+                    renderData(allData);
+                },
+                error: function(err) {
+                    const loadingEl = document.getElementById('loading');
+                    loadingEl.className = 'brutal-card bg-red-400 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6';
+                    loadingEl.innerText = '❌ Gagal memuat data dari Spreadsheet.';
+                    console.error("PapaParse error:", err);
+                }
+            });
+        });
+
+        function renderData(data) {
+            const container = document.getElementById('data-container');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full brutal-card bg-white p-6 text-center font-bold text-sm sm:text-base">
+                        📭 Tidak ada jadwal penampil untuk kategori ini.
+                    </div>
+                `;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const nama = item['Nama Penampil'] || item.namaPenampil || item.Nama || item.nama || 'Penampil';
+                const day = item['Day'] || item.day || item.Hari || item.hari || 'Day -';
+                const tanggal = item['Tgl Program'] || item.tglProgram || item.Tanggal || item.tanggal || '-';
+                const jam = item['Jam Program'] || item.jamProgram || item.Jam || item.jam || '-';
+
+                const card = document.createElement('div');
+                card.className = 'brutal-card bg-white p-4 sm:p-5 rounded-xl flex flex-col h-full justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <span class="bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded">
+                                📌 ${day}
+                            </span>
+                            <span class="bg-gray-100 border border-black text-gray-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded">
+                                #${index + 1}
+                            </span>
+                        </div>
+                        <h2 class="text-lg sm:text-xl font-black leading-snug break-words mb-4">${nama}</h2>
+                    </div>
+                    <div class="border-t-2 border-black pt-3 mt-auto space-y-1.5 text-xs font-bold text-gray-800">
+                        <div class="flex justify-between items-center">
+                            <span>📅 Tanggal:</span>
+                            <span class="bg-yellow-100 border border-black px-2 py-0.5 rounded">${tanggal}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>⏰ Waktu:</span>
+                            <span class="bg-yellow-300 border border-black px-2 py-0.5 rounded font-black">${jam}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterDay(selectedDay) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-yellow-300', 'font-black');
+                btn.classList.add('bg-white', 'font-bold');
+            });
+
+            event.target.classList.remove('bg-white', 'font-bold');
+            event.target.classList.add('bg-yellow-300', 'font-black');
+
+            if (selectedDay === 'ALL') {
+                renderData(allData);
+            } else {
+                const filtered = allData.filter(item => {
+                    const dayVal = item['Day'] || item.day || item.Hari || item.hari || '';
+                    return dayVal.toLowerCase().trim() === selectedDay.toLowerCase().trim();
+                });
+                renderData(filtered);
+            }
+        }
+    </script>
+</body>
+</html>
