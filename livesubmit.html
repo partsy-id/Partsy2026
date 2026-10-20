@@ -3,72 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOLUS STUDIO - Data Spreadsheet</title>
+    <title>Daftar Entri Spreadsheet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         /* Gaya Neo-Brutalism */
         .brutal-card {
             border: 3px solid #000;
-            box-shadow: 6px 6px 0px #000;
+            box-shadow: 4px 4px 0px #000;
             transition: all 0.2s ease;
         }
-        .brutal-card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 8px 8px 0px #000;
+        @media (min-width: 640px) {
+            .brutal-card {
+                box-shadow: 5px 5px 0px #000;
+            }
+            .brutal-card:hover {
+                transform: translate(-2px, -2px);
+                box-shadow: 7px 7px 0px #000;
+            }
         }
     </style>
 </head>
-<body class="bg-[#e4e4e7] text-gray-900 font-sans p-6 md:p-12">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl md:text-5xl font-black mb-8 border-b-4 border-black inline-block pb-2">
-            Daftar Entri
-        </h1>
+<body class="bg-[#f4f4f5] text-gray-900 font-sans p-4 sm:p-6 md:p-10 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="mb-6 sm:mb-10 text-center sm:text-left">
+            <h1 class="text-2xl sm:text-4xl md:text-5xl font-black border-b-4 border-black inline-block pb-1 sm:pb-2 uppercase tracking-tight">
+                Daftar Entri
+            </h1>
+            <p class="text-xs sm:text-base font-bold text-gray-700 mt-2 sm:mt-3">
+                Update Otomatis Real-time dari Google Spreadsheet
+            </p>
+        </header>
 
-        <div id="loading" class="text-xl font-bold animate-pulse">Memuat data langsung dari Spreadsheet...</div>
-        
-        <!-- Wadah untuk data -->
-        <div id="data-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        <!-- Status Loading -->
+        <div id="loading" class="brutal-card bg-yellow-300 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6 sm:mb-8">
+            ⚡ Memuat data langsung dari Spreadsheet...
+        </div>
+
+        <!-- Grid Responsif: 1 Kolom (Mobile), 2 Kolom (Tablet/HP Besar), 3-4 Kolom (Desktop) -->
+        <div id="data-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"></div>
     </div>
 
     <script>
-        // GANTI TEKS DI BAWAH INI DENGAN LINK CSV SPREADSHEET KAMU
+        // Link CSV Google Spreadsheet Kamu
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ73-NYEbMkdlQFL4se6HObeUJfdPA64Y2I1PnW-UoGNF8QBrM45pKJuPQSZpBQ9xmJt6Ghez7iSex6/pub?gid=0&single=true&output=csv';
 
         document.addEventListener('DOMContentLoaded', () => {
             Papa.parse(sheetUrl, {
                 download: true,
                 header: true,
+                skipEmptyLines: true,
                 complete: function(results) {
-                    document.getElementById('loading').style.display = 'none';
+                    const loadingEl = document.getElementById('loading');
+                    loadingEl.style.display = 'none';
+                    
                     const container = document.getElementById('data-container');
                     
-                    // Memfilter baris yang kosong
-                    const validData = results.data.filter(item => item.Nama || item.nama);
+                    // Memfilter baris kosong
+                    const validData = results.data.filter(item => {
+                        const namaVal = item.Nama || item.nama || item['NAMA'];
+                        return namaVal && namaVal.trim() !== '';
+                    });
 
-                    validData.forEach(item => {
-                        const nama = item.Nama || item.nama || 'Tanpa Nama';
-                        const bio = item.Bio || item.bio || '-';
-                        const asal = item.Asal || item.asal || '-';
-                        const tanggal = item.Tanggal || item.tanggal || '-';
+                    if (validData.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-span-full brutal-card bg-white p-6 sm:p-8 text-center font-bold text-base sm:text-lg">
+                                📭 Belum ada data di Spreadsheet. Silakan isi baris di Spreadsheet kamu!
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    validData.forEach((item, index) => {
+                        const nama = item.Nama || item.nama || item['NAMA'] || 'Tanpa Nama';
+                        const bio = item.Bio || item.bio || item['BIO'] || '-';
+                        const asal = item.Asal || item.asal || item['ASAL'] || '-';
+                        const tanggal = item.Tanggal || item.tanggal || item['TANGGAL'] || '-';
 
                         const card = document.createElement('div');
-                        card.className = 'brutal-card bg-white p-6 rounded-lg flex flex-col h-full';
+                        card.className = 'brutal-card bg-white p-4 sm:p-5 rounded-xl flex flex-col h-full justify-between';
                         card.innerHTML = `
-                            <h2 class="text-2xl font-bold mb-2">${nama}</h2>
-                            <span class="bg-yellow-300 text-sm font-bold border-2 border-black px-2 py-1 w-fit rounded-md mb-4">
-                                📍 ${asal}
-                            </span>
-                            <p class="text-gray-800 font-medium mb-6 flex-grow">${bio}</p>
-                            <div class="border-t-2 border-black pt-3 mt-auto text-right text-sm font-bold">
-                                📅 ${tanggal}
+                            <div>
+                                <div class="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                                    <h2 class="text-lg sm:text-xl font-black leading-snug break-words">${nama}</h2>
+                                    <span class="bg-black text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                        #${index + 1}
+                                    </span>
+                                </div>
+                                <div class="mb-3 sm:mb-4">
+                                    <span class="inline-block bg-yellow-300 text-[11px] sm:text-xs font-black border-2 border-black px-2 py-0.5 rounded-md">
+                                        📍 ${asal}
+                                    </span>
+                                </div>
+                                <p class="text-xs sm:text-sm font-semibold text-gray-800 break-words mb-4 leading-relaxed">
+                                    ${bio}
+                                </p>
+                            </div>
+                            <div class="border-t-2 border-black pt-2 sm:pt-3 mt-auto flex justify-between items-center text-[11px] sm:text-xs font-bold text-gray-700">
+                                <span>📅 Tanggal:</span>
+                                <span class="bg-gray-100 px-2 py-0.5 border border-black rounded">${tanggal}</span>
                             </div>
                         `;
                         container.appendChild(card);
                     });
                 },
                 error: function(err) {
-                    document.getElementById('loading').innerText = 'Gagal memuat data.';
+                    const loadingEl = document.getElementById('loading');
+                    loadingEl.className = 'brutal-card bg-red-400 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6 sm:mb-8';
+                    loadingEl.innerText = '❌ Gagal memuat data dari Spreadsheet.';
                     console.error("PapaParse error:", err);
                 }
             });
