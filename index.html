@@ -3,19 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOLUS STUDIO - Hub Links</title>
+    <title>Partsy 2026</title>
+    
     <!-- Memuat Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Mengimpor font geometris -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
+        
         body {
             font-family: 'Space Grotesk', sans-serif;
         }
+
+        /* Latar belakang grid khas Neo-Brutalism */
+        .bg-grid-pattern {
+            background-color: #f8f9fa; /* Warna dasar off-white terang */
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px; /* Ukuran kotak grid */
+            background-position: center center;
+        }
     </style>
 
-    <!-- Membuat custom class Tailwind untuk efisiensi kode HTML -->
+    <!-- Custom class Tailwind untuk efisiensi tombol -->
     <style type="text/tailwindcss">
         @layer components {
             .btn-brutal {
@@ -36,53 +48,53 @@
         }
     </style>
 </head>
-<body class="bg-[#f4ebd0] min-h-screen flex flex-col items-center justify-center p-6 m-0 overflow-x-hidden">
+<body class="bg-grid-pattern min-h-screen flex flex-col items-center justify-center p-6 m-0 overflow-x-hidden">
 
     <!-- Kontainer Utama -->
     <div class="w-full max-w-4xl mx-auto">
         
-        <!-- Judul Halaman (Opsional) -->
+        <!-- Header Judul -->
         <div class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-black uppercase tracking-wider mb-2 drop-shadow-[3px_3px_0_rgba(0,0,0,1)]">
-                KOLUS STUDIO
+            <!-- Label kecil / Badge (Opsional untuk estetika tambahan) -->
+            <span class="inline-block bg-black text-white px-3 py-1 text-sm md:text-base font-bold uppercase tracking-widest mb-3 shadow-[4px_4px_0px_0px_#4ade80]">
+                Sistem Portal
+            </span>
+            <h1 class="text-4xl md:text-6xl font-bold text-black uppercase tracking-wider mb-2 drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                PARTSY 2026
             </h1>
-            <p class="text-lg md:text-xl font-bold border-b-4 border-black inline-block pb-1">
-                Direktori Tautan
-            </p>
         </div>
 
         <!-- Grid untuk 6 Tombol -->
-        <!-- grid-cols-1 untuk HP, md:grid-cols-2 untuk Tablet/Desktop -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             
-            <!-- Tombol 1: Merah/Pink -->
-            <a href="https://github.com/KOLUS-STUDIO" class="btn-brutal bg-[#ff5757]">
-                GitHub Studio
+            <!-- Tombol 1: Hijau -->
+            <a href="https://github.com/KOLUS-STUDIO" class="btn-brutal bg-[#4ade80]">
+                GitHub Utama
             </a>
 
-            <!-- Tombol 2: Kuning -->
-            <a href="#" class="btn-brutal bg-[#fde047]">
-                Portofolio Web
+            <!-- Tombol 2: Biru -->
+            <a href="#" class="btn-brutal bg-[#60a5fa]">
+                Dokumentasi
             </a>
 
-            <!-- Tombol 3: Cyan -->
-            <a href="#" class="btn-brutal bg-[#67e8f9]">
-                Komisi & Klien
+            <!-- Tombol 3: Hijau -->
+            <a href="#" class="btn-brutal bg-[#4ade80]">
+                Aset Visual
             </a>
 
-            <!-- Tombol 4: Hijau -->
-            <a href="#" class="btn-brutal bg-[#86efac]">
-                Katalog Ilustrasi
+            <!-- Tombol 4: Biru -->
+            <a href="#" class="btn-brutal bg-[#60a5fa]">
+                Repositori Modul
             </a>
 
-            <!-- Tombol 5: Oranye -->
-            <a href="#" class="btn-brutal bg-[#fb923c]">
-                Instagram
+            <!-- Tombol 5: Hijau -->
+            <a href="#" class="btn-brutal bg-[#4ade80]">
+                Pengaturan
             </a>
 
-            <!-- Tombol 6: Ungu -->
-            <a href="#" class="btn-brutal bg-[#d8b4fe]">
-                Hubungi Saya
+            <!-- Tombol 6: Biru -->
+            <a href="#" class="btn-brutal bg-[#60a5fa]">
+                Kontak Dukungan
             </a>
 
         </div>
