@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOLUS STUDIO - Data Spreadsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        /* Gaya Neo-Brutalism */
+        .brutal-card {
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px #000;
+            transition: all 0.2s ease;
+        }
+        .brutal-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #000;
+        }
+    </style>
+</head>
+<body class="bg-[#e4e4e7] text-gray-900 font-sans p-6 md:p-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black mb-8 border-b-4 border-black inline-block pb-2">
+            Daftar Entri
+        </h1>
+
+        <div id="loading" class="text-xl font-bold animate-pulse">Memuat data langsung dari Spreadsheet...</div>
+        
+        <!-- Wadah untuk data -->
+        <div id="data-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </div>
+
+    <script>
+        // GANTI TEKS DI BAWAH INI DENGAN LINK CSV SPREADSHEET KAMU
+        const sheetUrl = 'URL_CSV_KAMU_DI_SINI';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Papa.parse(sheetUrl, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    document.getElementById('loading').style.display = 'none';
+                    const container = document.getElementById('data-container');
+                    
+                    // Memfilter baris yang kosong
+                    const validData = results.data.filter(item => item.Nama || item.nama);
+
+                    validData.forEach(item => {
+                        const nama = item.Nama || item.nama || 'Tanpa Nama';
+                        const bio = item.Bio || item.bio || '-';
+                        const asal = item.Asal || item.asal || '-';
+                        const tanggal = item.Tanggal || item.tanggal || '-';
+
+                        const card = document.createElement('div');
+                        card.className = 'brutal-card bg-white p-6 rounded-lg flex flex-col h-full';
+                        card.innerHTML = `
+                            <h2 class="text-2xl font-bold mb-2">${nama}</h2>
+                            <span class="bg-yellow-300 text-sm font-bold border-2 border-black px-2 py-1 w-fit rounded-md mb-4">
+                                📍 ${asal}
+                            </span>
+                            <p class="text-gray-800 font-medium mb-6 flex-grow">${bio}</p>
+                            <div class="border-t-2 border-black pt-3 mt-auto text-right text-sm font-bold">
+                                📅 ${tanggal}
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                },
+                error: function(err) {
+                    document.getElementById('loading').innerText = 'Gagal memuat data.';
+                    console.error("PapaParse error:", err);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
