@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Input Acara - Panitia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .brutal-card {
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0px #000;
+        }
+    </style>
+</head>
+<body class="bg-[#f4f4f5] text-gray-900 font-sans p-4 sm:p-8 min-h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-lg bg-white brutal-card p-6 sm:p-8 rounded-xl">
+        <!-- Header -->
+        <div class="mb-6 border-b-4 border-black pb-3">
+            <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-tight">Form Program Acara</h1>
+            <p class="text-xs sm:text-sm font-bold text-gray-600 mt-1">Input data penampil langsung ke Google Spreadsheet</p>
+        </div>
+
+        <!-- Alert Status -->
+        <div id="statusAlert" class="hidden mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm"></div>
+
+        <!-- Form -->
+        <form id="programForm" class="space-y-4 sm:space-y-5">
+            <!-- 1. Nama Penampil -->
+            <div>
+                <label class="block font-black text-sm uppercase mb-1">Nama Penampil</label>
+                <input type="text" id="namaPenampil" required placeholder="Contoh: Band Akustik / Sanggar Tari"
+                    class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+            </div>
+
+            <!-- 2. Day (1 - 5) -->
+            <div>
+                <label class="block font-black text-sm uppercase mb-1">Hari (Day)</label>
+                <select id="day" required
+                    class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                    <option value="" disabled selected>-- Pilih Day --</option>
+                    <option value="Day 1">Day 1</option>
+                    <option value="Day 2">Day 2</option>
+                    <option value="Day 3">Day 3</option>
+                    <option value="Day 4">Day 4</option>
+                    <option value="Day 5">Day 5</option>
+                </select>
+            </div>
+
+            <!-- 3. Tanggal & 4. Jam Program (Grid Responsif) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-black text-sm uppercase mb-1">Tgl Program</label>
+                    <input type="date" id="tglProgram" required
+                        class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                </div>
+                <div>
+                    <label class="block font-black text-sm uppercase mb-1">Jam Program</label>
+                    <input type="time" id="jamProgram" required
+                        class="w-full border-2 border-black p-2.5 rounded-lg font-semibold focus:outline-none focus:bg-yellow-100">
+                </div>
+            </div>
+
+            <!-- Tombol Submit -->
+            <button type="submit" id="submitBtn"
+                class="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-black border-2 border-black p-3 rounded-lg transition-transform active:translate-y-1 shadow-[3px_3px_0px_#000]">
+                🚀 SIMPAN DATA
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // PASTE URL DEPLOYMENT GOOGLE APPS SCRIPT KAMU DI SINI
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwaKnBVzlwb08IARq9jSuAka_rmcMSr4QTwYVy7HKZ_Y0fLB8NOGZqOkmV9zS2rNSsrdQ/exec';
+
+        const form = document.getElementById('programForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusAlert = document.getElementById('statusAlert');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            // Ubah state tombol saat proses pengiriman
+            submitBtn.disabled = true;
+            submitBtn.innerText = '⏳ Menyimpan...';
+            statusAlert.classList.add('hidden');
+
+            const payload = {
+                namaPenampil: document.getElementById('namaPenampil').value,
+                day: document.getElementById('day').value,
+                tglProgram: document.getElementById('tglProgram').value,
+                jamProgram: document.getElementById('jamProgram').value
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Mencegah kendala aturan CORS dari Google Script
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Tampilkan notifikasi sukses
+                statusAlert.className = 'mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm bg-green-300 text-black';
+                statusAlert.innerText = '✅ Data berhasil disimpan ke Spreadsheet!';
+                statusAlert.classList.remove('hidden');
+
+                // Reset form
+                form.reset();
+                submitBtn.disabled = false;
+                submitBtn.innerText = '🚀 SIMPAN DATA';
+            })
+            .catch(error => {
+                // Tampilkan notifikasi gagal
+                statusAlert.className = 'mb-6 p-4 rounded-lg border-2 border-black font-bold text-sm bg-red-300 text-black';
+                statusAlert.innerText = '❌ Gagal mengirim data. Coba lagi!';
+                statusAlert.classList.remove('hidden');
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = '🚀 SIMPAN DATA';
+                console.error('Error!', error.message);
+            });
+        });
+    </script>
+</body>
+</html>
