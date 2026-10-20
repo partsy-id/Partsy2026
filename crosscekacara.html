@@ -37,22 +37,22 @@
 
         <!-- Filter Tab Hari (Day 1 - Day 5) -->
         <div class="mb-6 sm:mb-8 flex flex-wrap gap-2 justify-center sm:justify-start" id="filter-container">
-            <button onclick="filterDay('ALL')" class="filter-btn active-btn brutal-card bg-yellow-300 text-black px-4 py-2 rounded-lg font-black text-xs sm:text-sm">
+            <button onclick="filterDay('ALL', this)" class="filter-btn brutal-card bg-yellow-300 text-black px-4 py-2 rounded-lg font-black text-xs sm:text-sm">
                 Semua Hari
             </button>
-            <button onclick="filterDay('Day 1')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+            <button onclick="filterDay('Day 1', this)" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
                 Day 1
             </button>
-            <button onclick="filterDay('Day 2')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+            <button onclick="filterDay('Day 2', this)" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
                 Day 2
             </button>
-            <button onclick="filterDay('Day 3')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+            <button onclick="filterDay('Day 3', this)" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
                 Day 3
             </button>
-            <button onclick="filterDay('Day 4')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+            <button onclick="filterDay('Day 4', this)" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
                 Day 4
             </button>
-            <button onclick="filterDay('Day 5')" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
+            <button onclick="filterDay('Day 5', this)" class="filter-btn brutal-card bg-white text-black px-4 py-2 rounded-lg font-bold text-xs sm:text-sm">
                 Day 5
             </button>
         </div>
@@ -78,7 +78,8 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
-                    document.getElementById('loading').style.display = 'none';
+                    const loadingEl = document.getElementById('loading');
+                    if (loadingEl) loadingEl.style.display = 'none';
                     
                     // Memfilter baris kosong
                     allData = results.data.filter(item => {
@@ -90,8 +91,10 @@
                 },
                 error: function(err) {
                     const loadingEl = document.getElementById('loading');
-                    loadingEl.className = 'brutal-card bg-red-400 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6';
-                    loadingEl.innerText = '❌ Gagal memuat data dari Spreadsheet.';
+                    if (loadingEl) {
+                        loadingEl.className = 'brutal-card bg-red-400 p-4 sm:p-6 rounded-lg text-center font-black text-base sm:text-xl mb-6';
+                        loadingEl.innerText = '❌ Gagal memuat data dari Spreadsheet.';
+                    }
                     console.error("PapaParse error:", err);
                 }
             });
@@ -145,15 +148,17 @@
             });
         }
 
-        function filterDay(selectedDay) {
+        function filterDay(selectedDay, btnElement) {
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('bg-yellow-300', 'font-black');
                 btn.classList.add('bg-white', 'font-bold');
             });
 
-            event.target.classList.remove('bg-white', 'font-bold');
-            event.target.classList.add('bg-yellow-300', 'font-black');
+            if (btnElement) {
+                btnElement.classList.remove('bg-white', 'font-bold');
+                btnElement.classList.add('bg-yellow-300', 'font-black');
+            }
 
             if (selectedDay === 'ALL') {
                 renderData(allData);
