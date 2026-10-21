@@ -1,98 +1,211 @@
-<form id="rundownForm">
-  <div>
-    <label for="namaProgram">Nama Program:</label><br>
-    <input type="text" id="namaProgram" placeholder="Contoh: Workshop UI/UX" required>
-  </div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Form Rundown Acara</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #22c55e;
+      background-image: radial-gradient(#15803d 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    .neo-box {
+      border: 4px solid #000000;
+      box-shadow: 6px 6px 0px #000000;
+      transition: all 0.15s ease-in-out;
+    }
+    .neo-button {
+      border: 4px solid #000000;
+      box-shadow: 5px 5px 0px #000000;
+      transition: all 0.1s ease-in-out;
+    }
+    .neo-button:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px #000000;
+    }
+    .neo-button:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0px #000000;
+    }
+    .neo-input {
+      border: 3px solid #000000;
+      box-shadow: 3px 3px 0px #000000;
+      outline: none;
+    }
+    .neo-input:focus {
+      border-color: #000000;
+      box-shadow: 5px 5px 0px #2563eb;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-10 px-4 text-slate-900">
 
-  <br>
-  <div>
-    <label for="hari">Hari (Day):</label><br>
-    <select id="hari" required>
-      <option value="">-- Pilih Hari --</option>
-      <option value="Day 1">Day 1</option>
-      <option value="Day 2">Day 2</option>
-      <option value="Day 3">Day 3</option>
-      <option value="Day 4">Day 4</option>
-      <option value="Day 5">Day 5</option>
-    </select>
-  </div>
+  <div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="neo-box bg-blue-600 text-white p-6 mb-8 text-center rounded-none relative overflow-hidden">
+      <div class="absolute -top-6 -right-6 w-20 h-20 bg-yellow-400 border-4 border-black rotate-12"></div>
+      <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-wider text-black bg-emerald-400 inline-block px-4 py-1 border-4 border-black mb-2 shadow-[4px_4px_0px_#000]">
+        RUNDOWN ACARA
+      </h1>
+      <p class="font-bold text-slate-100 mt-2 text-sm sm:text-base">Input Jadwal & Upload Lampiran ke Google Sheets & Drive</p>
+    </div>
 
-  <br>
-  <div>
-    <label for="tanggal">Tanggal:</label><br>
-    <input type="date" id="tanggal" required>
-  </div>
-
-  <br>
-  <div>
-    <label for="jamMulai">Jam Mulai:</label><br>
-    <input type="time" id="jamMulai" required>
-  </div>
-
-  <br>
-  <div>
-    <label for="jamSelesai">Jam Berakhir:</label><br>
-    <input type="time" id="jamSelesai" required>
-  </div>
-
-  <br>
-  <div>
-    <label for="gambar">Upload Gambar Rundown / Banner:</label><br>
-    <input type="file" id="gambar" accept="image/*" required>
-  </div>
-
-  <br>
-  <button type="submit" id="btnSubmit">Kirim Rundown</button>
-</form>
-
-<script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3wLX7lzLaerfCJZnrEBl_RmCol55joKOGuLcS-3DV9kyx3yBh9gB67bAZCY7NkHjmg/exec'; // Ganti dengan URL Web App Apps Script
-
-  document.getElementById('rundownForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const btn = document.getElementById('btnSubmit');
-    btn.disabled = true;
-    btn.innerText = 'Mengirim...';
-
-    const fileInput = document.getElementById('gambar');
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = function(evt) {
-      const payload = {
-        namaProgram: document.getElementById('namaProgram').value,
-        hari: document.getElementById('hari').value,
-        tanggal: document.getElementById('tanggal').value,
-        jamMulai: document.getElementById('jamMulai').value,
-        jamSelesai: document.getElementById('jamSelesai').value,
-        fileName: file.name,
-        fileData: evt.target.result
-      };
+    <!-- Form Container -->
+    <form id="rundownForm" class="neo-box bg-white p-6 sm:p-8 mb-8 space-y-6">
       
-      fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(response => {
-        if(response.result === 'success') {
-          alert('Data rundown berhasil disimpan!');
-          document.getElementById('rundownForm').reset();
-        } else {
-          alert('Gagal menyimpan data: ' + response.error);
+      <!-- Nama Program -->
+      <div>
+        <label for="namaProgram" class="block font-black text-lg uppercase mb-2">Nama Program / Sesi</label>
+        <input type="text" id="namaProgram" placeholder="Contoh: Opening Ceremony & Keynote" required
+          class="neo-input w-full p-3 font-bold bg-slate-50 focus:bg-white text-black placeholder-slate-400">
+      </div>
+
+      <!-- Grid Hari & Tanggal -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label for="hari" class="block font-black text-lg uppercase mb-2">Hari (Day)</label>
+          <select id="hari" required class="neo-input w-full p-3 font-bold bg-emerald-300 text-black cursor-pointer">
+            <option value="" disabled selected>-- Pilih Hari --</option>
+            <option value="Day 1">Day 1</option>
+            <option value="Day 2">Day 2</option>
+            <option value="Day 3">Day 3</option>
+            <option value="Day 4">Day 4</option>
+            <option value="Day 5">Day 5</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="tanggal" class="block font-black text-lg uppercase mb-2">Tanggal</label>
+          <input type="date" id="tanggal" required class="neo-input w-full p-3 font-bold bg-slate-50 focus:bg-white">
+        </div>
+      </div>
+
+      <!-- Grid Jam -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label for="jamMulai" class="block font-black text-lg uppercase mb-2">Jam Mulai</label>
+          <input type="time" id="jamMulai" required class="neo-input w-full p-3 font-bold bg-slate-50 focus:bg-white">
+        </div>
+
+        <div>
+          <label for="jamSelesai" class="block font-black text-lg uppercase mb-2">Jam Berakhir</label>
+          <input type="time" id="jamSelesai" required class="neo-input w-full p-3 font-bold bg-slate-50 focus:bg-white">
+        </div>
+      </div>
+
+      <!-- Upload Gambar -->
+      <div>
+        <label for="gambar" class="block font-black text-lg uppercase mb-2">Upload Gambar / Banner</label>
+        <div class="neo-box bg-sky-200 p-4 text-center cursor-pointer hover:bg-sky-300 relative">
+          <input type="file" id="gambar" accept="image/*" required 
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)">
+          <div id="uploadPlaceholder" class="space-y-2">
+            <svg class="w-10 h-10 mx-auto text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="font-black text-sm uppercase">Klik di sini untuk memilih file gambar</p>
+          </div>
+          <div id="imagePreviewContainer" class="hidden">
+            <img id="imgPreview" class="max-h-48 mx-auto border-2 border-black shadow-[3px_3px_0px_#000]" alt="Preview">
+            <p id="fileName" class="font-bold text-xs mt-2 text-black underline"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" id="btnSubmit" 
+        class="neo-button w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xl py-4 uppercase tracking-wider">
+        KIRIM DATA RUNDOWN
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="text-center font-bold text-black text-sm bg-emerald-300 border-2 border-black p-2 inline-block mx-auto w-full">
+      💡 Pastikan URL Web App Google Apps Script kamu sudah dimasukkan pada variabel <code class="bg-yellow-300 px-1 border border-black">scriptURL</code> di script.
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT KAMU DI SINI:
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3wLX7lzLaerfCJZnrEBl_RmCol55joKOGuLcS-3DV9kyx3yBh9gB67bAZCY7NkHjmg/exec';
+
+    function previewImage(event) {
+      const input = event.target;
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('uploadPlaceholder').classList.add('hidden');
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          document.getElementById('imgPreview').src = e.target.result;
+          document.getElementById('fileName').innerText = input.files[0].name;
         }
-      })
-      .catch(error => {
-        console.error('Error!', error.message);
-        alert('Terjadi kesalahan saat mengunggah data.');
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.innerText = 'Kirim Rundown';
-      });
-    };
-    
-    reader.readAsDataURL(file);
-  });
-</script>
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    document.getElementById('rundownForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (scriptURL === 'MASUKKAN_URL_WEB_APP_GOOGLE_APPS_SCRIPT_KAMU_DI_SINI' || !scriptURL) {
+        alert('Harap masukkan URL Google Apps Script kamu terlebih dahulu di dalam file index.html!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = 'MEMPROSES & MENGUNGGAH...';
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+      const fileInput = document.getElementById('gambar');
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(evt) {
+        const payload = {
+          namaProgram: document.getElementById('namaProgram').value,
+          hari: document.getElementById('hari').value,
+          tanggal: document.getElementById('tanggal').value,
+          jamMulai: document.getElementById('jamMulai').value,
+          jamSelesai: document.getElementById('jamSelesai').value,
+          fileName: file.name,
+          fileData: evt.target.result
+        };
+
+        fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(response => {
+          if (response.result === 'success') {
+            alert('🎉 Sukses! Data rundown dan gambar berhasil disimpan ke Google Sheets & Drive.');
+            document.getElementById('rundownForm').reset();
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+          } else {
+            alert('❌ Gagal menyimpan data: ' + response.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error!', error.message);
+          alert('❌ Terjadi kesalahan koneksi saat mengunggah data.');
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerText = originalText;
+          btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        });
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
