@@ -73,6 +73,25 @@
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwvtxgtwRi--Y97ga-eOnto-DWiPi4W9Gb6Ejq4Ccw7fcev213bgDQPEO_TNiieBldDyw/exec';
 
+    // Fungsi pembersih format Tanggal (contoh: 2026-10-20T17:00:00.000Z -> 2026-10-20)
+    function cleanDate(val) {
+      if (!val) return '-';
+      if (typeof val === 'string' && val.includes('T')) {
+        return val.split('T')[0];
+      }
+      return val;
+    }
+
+    // Fungsi pembersih format Jam (contoh: 1899-12-30T06:05:48.000Z -> 06:05)
+    function cleanTime(val) {
+      if (!val) return '--:--';
+      if (typeof val === 'string' && val.includes('T')) {
+        const timePart = val.split('T')[1];
+        return timePart.substring(0, 5); // Mengambil HH:mm
+      }
+      return val;
+    }
+
     // Mengubah URL view Google Drive biasa ke direct image preview
     function getDirectImageUrl(url) {
       if (!url) return '';
@@ -101,11 +120,14 @@
             container.innerHTML = '';
             countLabel.innerText = `Total: ${response.data.length} Sesi`;
 
-            response.data.forEach((item, index) => {
+            response.data.forEach((item) => {
               const card = document.createElement('div');
               card.className = 'neo-box bg-white p-6 relative overflow-hidden';
 
               const imageUrl = getDirectImageUrl(item.fileUrl);
+              const formattedDate = cleanDate(item.tanggal);
+              const formattedJamMulai = cleanTime(item.jamMulai);
+              const formattedJamSelesai = cleanTime(item.jamSelesai);
 
               card.innerHTML = `
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b-4 border-black pb-4 mb-4">
@@ -114,12 +136,12 @@
                       ${item.hari || 'Day -'}
                     </span>
                     <span class="neo-badge bg-emerald-300 text-black font-bold px-3 py-1 text-sm inline-block mt-2 sm:mt-0">
-                      📅 ${item.tanggal || '-'}
+                      📅 ${formattedDate}
                     </span>
                     <h2 class="text-2xl font-black uppercase mt-3 text-black">${item.namaProgram || 'Tanpa Nama Sesi'}</h2>
                   </div>
                   <div class="neo-badge bg-yellow-300 font-black px-4 py-2 text-lg text-black self-start md:self-auto">
-                    ⏰ ${item.jamMulai || '--:--'} - ${item.jamSelesai || '--:--'}
+                    ⏰ ${formattedJamMulai} - ${formattedJamSelesai}
                   </div>
                 </div>
 
