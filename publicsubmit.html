@@ -53,7 +53,7 @@
       <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-wider text-black bg-emerald-400 inline-block px-4 py-1 border-4 border-black mb-2 shadow-[4px_4px_0px_#000]">
         RUNDOWN ACARA
       </h1>
-      <p class="font-bold text-slate-100 mt-2 text-sm sm:text-base">Input Jadwal & Upload </p>
+      <p class="font-bold text-slate-100 mt-2 text-sm sm:text-base">Input Jadwal & Upload Lampiran ke Google Sheets & Drive</p>
     </div>
 
     <!-- Form Container -->
@@ -124,88 +124,12 @@
         KIRIM DATA RUNDOWN
       </button>
     </form>
-
-    <!-- Footer -->
-    <div class="text-center font-bold text-black text-sm bg-emerald-300 border-2 border-black p-2 inline-block mx-auto w-full">
-      Tenkyuuuuuuuuuu!!!!!! <code class="bg-yellow-300 px-1 border border-black">scriptURL</code>
-    </div>
   </div>
 
   <script>
-    // ⚠️ TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT KAMU DI SINI:
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3wLX7lzLaerfCJZnrEBl_RmCol55joKOGuLcS-3DV9kyx3yBh9gB67bAZCY7NkHjmg/exec';
 
     function previewImage(event) {
       const input = event.target;
       if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('uploadPlaceholder').classList.add('hidden');
-          document.getElementById('imagePreviewContainer').classList.remove('hidden');
-          document.getElementById('imgPreview').src = e.target.result;
-          document.getElementById('fileName').innerText = input.files[0].name;
-        }
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    document.getElementById('rundownForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      if (scriptURL === 'https://script.google.com/macros/s/AKfycbwu3wLX7lzLaerfCJZnrEBl_RmCol55joKOGuLcS-3DV9kyx3yBh9gB67bAZCY7NkHjmg/exec' || !scriptURL) {
-        alert('Harap masukkan URL Google Apps Script kamu terlebih dahulu di dalam file index.html!');
-        return;
-      }
-
-      const btn = document.getElementById('btnSubmit');
-      const originalText = btn.innerText;
-      btn.disabled = true;
-      btn.innerText = 'MEMPROSES & MENGUNGGAH...';
-      btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-      const fileInput = document.getElementById('gambar');
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function(evt) {
-        const payload = {
-          namaProgram: document.getElementById('namaProgram').value,
-          hari: document.getElementById('hari').value,
-          tanggal: document.getElementById('tanggal').value,
-          jamMulai: document.getElementById('jamMulai').value,
-          jamSelesai: document.getElementById('jamSelesai').value,
-          fileName: file.name,
-          fileData: evt.target.result
-        };
-
-        fetch(scriptURL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(response => {
-          if (response.result === 'success') {
-            alert('🎉 Sukses! Data rundown dan gambar berhasil disimpan ke Google Sheets & Drive.');
-            document.getElementById('rundownForm').reset();
-            document.getElementById('uploadPlaceholder').classList.remove('hidden');
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-          } else {
-            alert('❌ Gagal menyimpan data: ' + response.error);
-          }
-        })
-        .catch(error => {
-          console.error('Error!', error.message);
-          alert('❌ Terjadi kesalahan koneksi saat mengunggah data.');
-        })
-        .finally(() => {
-          btn.disabled = false;
-          btn.innerText = originalText;
-          btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        });
-      };
-
-      reader.readAsDataURL(file);
-    });
-  </script>
-</body>
-</html>
+        const reader = new
