@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jadwal Rundown Acara</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: #22c55e;
+      background-image: radial-gradient(#15803d 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    .neo-box {
+      border: 4px solid #000000;
+      box-shadow: 6px 6px 0px #000000;
+      transition: all 0.15s ease-in-out;
+    }
+    .neo-badge {
+      border: 3px solid #000000;
+      box-shadow: 3px 3px 0px #000000;
+    }
+    .neo-button {
+      border: 4px solid #000000;
+      box-shadow: 5px 5px 0px #000000;
+      transition: all 0.1s ease-in-out;
+    }
+    .neo-button:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px #000000;
+    }
+    .neo-button:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0px #000000;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-10 px-4 text-slate-900">
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="neo-box bg-blue-600 text-white p-6 mb-8 text-center relative overflow-hidden">
+      <div class="absolute -top-6 -right-6 w-20 h-20 bg-yellow-400 border-4 border-black rotate-12"></div>
+      <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-wider text-black bg-emerald-400 inline-block px-4 py-1 border-4 border-black mb-2 shadow-[4px_4px_0px_#000]">
+        JADWAL RUNDOWN ACARA
+      </h1>
+      <p class="font-bold text-slate-100 mt-2 text-sm sm:text-base">Daftar Sesi & Lampiran Langsung Dari Google Sheets</p>
+    </div>
+
+    <!-- Controls / Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+      <button onclick="fetchRundownData()" class="neo-button bg-yellow-400 hover:bg-yellow-300 text-black font-black px-6 py-3 uppercase flex items-center gap-2">
+        <span>🔄</span> Muat Ulang Data
+      </button>
+      <div id="dataCount" class="neo-badge bg-white text-black font-black px-4 py-2 text-sm">
+        Memuat...
+      </div>
+    </div>
+
+    <!-- Container Data Rundown -->
+    <div id="rundownContainer" class="space-y-6">
+      <!-- Loading State awal -->
+      <div class="neo-box bg-white p-8 text-center font-black text-xl">
+        ⏳ SEDANG MEMUAT DATA RUNDOWN...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3wLX7lzLaerfCJZnrEBl_RmCol55joKOGuLcS-3DV9kyx3yBh9gB67bAZCY7NkHjmg/exec';
+
+    // Mengubah URL view Google Drive biasa ke direct image preview
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
+      }
+      return url;
+    }
+
+    function fetchRundownData() {
+      const container = document.getElementById('rundownContainer');
+      const countLabel = document.getElementById('dataCount');
+      
+      container.innerHTML = `
+        <div class="neo-box bg-white p-8 text-center font-black text-xl">
+          ⏳ SEDANG MEMUAT DATA RUNDOWN...
+        </div>
+      `;
+      countLabel.innerText = 'Memuat...';
+
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(response => {
+          if (response.result === 'success' && response.data.length > 0) {
+            container.innerHTML = '';
+            countLabel.innerText = `Total: ${response.data.length} Sesi`;
+
+            response.data.forEach((item, index) => {
+              const card = document.createElement('div');
+              card.className = 'neo-box bg-white p-6 relative overflow-hidden';
+
+              const imageUrl = getDirectImageUrl(item.fileUrl);
+
+              card.innerHTML = `
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b-4 border-black pb-4 mb-4">
+                  <div>
+                    <span class="neo-badge bg-blue-600 text-white font-black px-3 py-1 text-sm uppercase mr-2 inline-block">
+                      ${item.hari || 'Day -'}
+                    </span>
+                    <span class="neo-badge bg-emerald-300 text-black font-bold px-3 py-1 text-sm inline-block mt-2 sm:mt-0">
+                      📅 ${item.tanggal || '-'}
+                    </span>
+                    <h2 class="text-2xl font-black uppercase mt-3 text-black">${item.namaProgram || 'Tanpa Nama Sesi'}</h2>
+                  </div>
+                  <div class="neo-badge bg-yellow-300 font-black px-4 py-2 text-lg text-black self-start md:self-auto">
+                    ⏰ ${item.jamMulai || '--:--'} - ${item.jamSelesai || '--:--'}
+                  </div>
+                </div>
+
+                ${imageUrl ? `
+                  <div class="mt-4">
+                    <p class="font-black text-sm uppercase mb-2">Lampiran / Banner Sesi:</p>
+                    <a href="${item.fileUrl}" target="_blank" title="Klik untuk lihat gambar penuh">
+                      <img src="${imageUrl}" alt="Lampiran Rundown" class="neo-box max-h-64 w-full object-cover rounded-none hover:opacity-90 bg-slate-100" />
+                    </a>
+                  </div>
+                ` : ''}
+              `;
+
+              container.appendChild(card);
+            });
+          } else {
+            container.innerHTML = `
+              <div class="neo-box bg-white p-8 text-center font-black text-xl">
+                📭 BELUM ADA DATA RUNDOWN DI SPREADSHEET.
+              </div>
+            `;
+            countLabel.innerText = '0 Sesi';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching data:', err);
+          container.innerHTML = `
+            <div class="neo-box bg-red-400 p-8 text-center font-black text-xl text-black">
+              ❌ GAGAL MEMUAT DATA. PASTIKAN GOOGLE APPS SCRIPT SUDAH DIDEPLOY DENGAN METODE GET.
+            </div>
+          `;
+          countLabel.innerText = 'Error';
+        });
+    }
+
+    // Load otomatis saat halaman pertama kali dibuka
+    window.addEventListener('DOMContentLoaded', fetchRundownData);
+  </script>
+</body>
+</html>
